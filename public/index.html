@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-eclsquiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+      integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh"
+      crossorigin="anonymous"
+    />
+
+    <title>Read the pdf file</title>
+    <script src="index.js"></script>
+  </head>
+
+  <body>
+    <!-- post the file -->
+    <h1 style="padding-left: 20px">From .pdf file to .xml file</h1>
+    <form
+      method="POST"
+      action="/upload"
+      enctype="multipart/form-data"
+      style="padding-top: 40px; padding-left: 20px; color: blue"
+      name="id"
+      id="id"
+    >
+      <div>
+        <input type="file" name="myFile" id="fileUpload" multiple />
+      </div>
+      <br />
+      <div>
+        <input type="submit" name="btn_upload" value="Upload" />
+      </div>
+    </form>
+    <br />
+    <!-- dropdown menu -->
+    <p
+      id="instructions"
+      style="
+        color: blue;
+        padding-left: 20px;
+        font-style: italic;
+        display: inline;
+      "
+    >
+      Prima fai upload del file poi scegli il supplier - Per Hong In e Chlorgas
+      clicca i rispettivi buttons
+    </p>
+    <br /><br />
+    <div
+      id="btndropdown"
+      class="btn-group"
+      style="padding: 20px; display: inline"
+    >
+      <button
+        type="button"
+        class="btn btn-primary dropdown-toggle"
+        data-toggle="dropdown"
+        aria-haspopup="true"
+        aria-expanded="false"
+      >
+        Supplier list
+      </button>
+      <span id="fine" style="color: blue; display: none">
+        Download OK. Scegli il supplier cliccando sotto
+      </span>
+      <div class="dropdown-menu" id="">
+        <div class="link-list-wrapper">
+          <ul class="link-list" style="width: 200px">
+            <li>
+              <a class="list-item" href="#" onclick="WackerHCl()"
+                ><span>Wacker HCl drums</span></a
+              >
+            </li>
+            <li>
+              <a class="list-item" href="#" onclick="HongInStart()"
+                ><span>Hong In cyl's and drums</span></a
+              >
+            </li>
+            <li>
+              <a class="list-item" href="#" onclick="ChlorgasStart()"
+                ><span>Chlorgas drums</span></a
+              >
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <!-- end dropdown -->
+
+    <!-- button to open Hong Instruction modal -->
+    <button
+      type="button"
+      class="btn btn-primary"
+      data-toggle="modal"
+      data-target="#exampleModal"
+      id="modalHI"
+    >
+      Hong In instructions
+    </button>
+
+    <!-- Modal -->
+    <div
+      class="modal fade"
+      id="exampleModal"
+      tabindex="-1"
+      role="dialog"
+      aria-labelledby="exampleModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">
+              Hong In eCOA uploads
+            </h5>
+            <button
+              type="button"
+              class="close"
+              data-dismiss="modal"
+              aria-label="Close"
+            >
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <pre>Cliccare qui sotto per aprire pdftotext </pre>
+            <pre>caricare eCOA Hong In in .pdf</pre>
+            <pre>scaricare il file .zip </pre>
+            <pre>estrarre il file .txt e salvarlo</pre>
+            <pre>tornare in home page</pre>
+            <pre>caricare il file. txt sul sito ('Scegli file' + 'Upload')</pre>
+            <pre>cliccare 'Supplier List'</pre>
+            <pre>cliccare 'Hong In cyl's and drums'</pre>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-dismiss="modal"
+            >
+              Close
+            </button>
+            <a
+              type="button"
+              href="https://pdftotext.com/it/"
+              class="btn btn-primary"
+              >Go to website to switch from .pdf to .txt file</a
+            >
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- end of modal -->
+    <!-- button to open Chlorgas Instruction modal -->
+    <button
+      type="button"
+      class="btn btn-primary"
+      data-toggle="modal"
+      data-target="#ModalCS"
+      id="modalCS"
+      style="margin-left: 20px"
+    >
+      Chlorgas instructions
+    </button>
+
+    <!-- Modal -->
+    <div
+      class="modal fade"
+      id="ModalCS"
+      tabindex="-1"
+      role="dialog"
+      aria-labelledby="ModalLabelCS"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="ModalLabelCS">Chlorgas eCOA uploads</h5>
+            <button
+              type="button"
+              class="close"
+              data-dismiss="modal"
+              aria-label="Close"
+            >
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <pre>Cliccare qui sotto per aprire ocr.space </pre>
+            <pre>caricare eCOA Chlorgas in .pdf</pre>
+            <pre>scegliere opzione 'Just extract text ...' </pre>
+            <pre>e anche 'Use OCR Engine 1'</pre>
+            <pre>cliccare 'Start OCR!', scaricare il file .txt e salvarlo</pre>
+            <pre>tornare in home page</pre>
+            <pre>caricare il file. txt sul sito ('Scegli file' + 'Upload')</pre>
+            <pre>cliccare 'Supplier List'</pre>
+            <pre>cliccare 'Chlorgas drums'</pre>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-dismiss="modal"
+            >
+              Close
+            </button>
+            <a type="button" href="https://ocr.space/" class="btn btn-primary"
+              >Go to website to switch from .pdf to .txt file</a
+            >
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- end of modal -->
+    <br />
+    <!-- HongIn # of lines in ecOA -->
+    <div id="qtyinput" style="padding-left: 20px; display: none">
+      <p id="supplierHongIn" style="display: none; font-size: large">
+        Hong In HCl drums
+      </p>
+      <br />
+      <label id="label1" for="test" class="label" style="padding-left: 20px">
+        Numero dei lotti (righe) nell'eCOA Hong In</label
+      >
+      <input id="CoaLines" type="number" style="width: 60px" />
+      <button
+        id="btnqty"
+        class="btn btn-primary"
+        style="width: 50px"
+        onclick="HongInLines()"
+      >
+        OK
+      </button>
+    </div>
+    <br />
+    <p id="qtyPagesHongIn" style="padding-left: 20px; display: none"></p>
+    <!-- ------------------------------------- -->
+    <!-- Chlorgas # of lines in ecOA -->
+    <div id="qtyinputCS" style="padding-left: 20px; display: none">
+      <p id="supplierHongIn" style="display: none; font-size: large">
+        Chlorgas HCl drums
+      </p>
+      <br />
+      <label id="label1" for="test" class="label" style="padding-left: 20px">
+        Numero dei lotti (righe) nell'eCOA Chlorgas</label
+      >
+      <input id="CoaLinesCS" type="number" style="width: 60px" />
+      <button
+        id="btnqty"
+        class="btn btn-primary"
+        style="width: 50px"
+        onclick="ChlorgasLines()"
+      >
+        OK
+      </button>
+    </div>
+    <br />
+    <p id="qtyPagesCS" style="padding-left: 20px; display: none"></p>
+    <br />
+    <!-- ------Wacker------- -->
+    <p
+      id="supplierWacker"
+      style="display: none; font-size: large; padding-left: 20px; color: blue"
+    >
+      Product: Wacker drums
+    </p>
+    <br />
+    <!-- download button -->
+    <div id="btndown" style="padding-left: 20px; display: none">
+      <a href="\download" class="btn btn-primary">
+        Click here to download the xml file
+      </a>
+      <br /><br />
+    </div>
+
+    <!-- End download button -->
+    <!-- Home button -->
+    <button
+      id="btnHome"
+      onclick="goHome()"
+      style="margin-left: 20px; display: none"
+      class="btn btn-primary"
+    >
+      Reset and upload another file
+    </button>
+    <!-- end home button -->
+    <script>
+      function goHome() {
+        window.location.href = "index.html";
+      }
+    </script>
+    <script
+      src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
+      integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
+      integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"
+      integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"
+      crossorigin="anonymous"
+    ></script>
+  </body>
+</html>
