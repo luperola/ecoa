@@ -45,8 +45,8 @@
         display: inline;
       "
     >
-      Prima fai upload del file poi scegli il supplier - Per Hong In e Chlorgas
-      clicca i rispettivi buttons
+      Prima fai upload del file poi scegli il supplier - Per Chlorgas clicca il
+      relativo button
     </p>
     <br /><br />
     <div
@@ -68,20 +68,35 @@
       </span>
       <div class="dropdown-menu" id="">
         <div class="link-list-wrapper">
-          <ul class="link-list" style="width: 200px">
+          <ul class="link-list" style="width: 300px">
             <li>
-              <a class="list-item" href="#" onclick="WackerHCl()"
-                ><span>Wacker HCl drums</span></a
+              <a class="list-item" href="#" onclick="WackerHClAGR()"
+                ><span>Wacker HCl kg 550 Agrate</span></a
               >
             </li>
             <li>
-              <a class="list-item" href="#" onclick="HongInStart()"
-                ><span>Hong In cyl's and drums</span></a
+              <a class="list-item" href="#" onclick="WackerHClCAT()"
+                ><span>Wacker HCl kg 660 Catania</span></a
               >
             </li>
             <li>
               <a class="list-item" href="#" onclick="ChlorgasStart()"
                 ><span>Chlorgas drums</span></a
+              >
+            </li>
+            <li>
+              <a class="list-item" href="#" onclick="HongInAGR()"
+                ><span>Hong In drums Agrate </span></a
+              >
+            </li>
+            <li>
+              <a class="list-item" href="#" onclick="HongInCAT()"
+                ><span>Hong In drums Catania</span></a
+              >
+            </li>
+            <li>
+              <a class="list-item" href="#" onclick="TCSBurghausen()"
+                ><span>TCS Burghausen</span></a
               >
             </li>
           </ul>
@@ -91,7 +106,7 @@
     <!-- end dropdown -->
 
     <!-- button to open Hong Instruction modal -->
-    <button
+    <!--  <button
       type="button"
       class="btn btn-primary"
       data-toggle="modal"
@@ -99,10 +114,10 @@
       id="modalHI"
     >
       Hong In instructions
-    </button>
+    </button> -->
 
     <!-- Modal -->
-    <div
+    <!-- <div
       class="modal fade"
       id="exampleModal"
       tabindex="-1"
@@ -152,7 +167,7 @@
           </div>
         </div>
       </div>
-    </div>
+    </div> -->
     <!-- end of modal -->
     <!-- button to open Chlorgas Instruction modal -->
     <button
@@ -217,7 +232,7 @@
     <!-- end of modal -->
     <br />
     <!-- HongIn # of lines in ecOA -->
-    <div id="qtyinput" style="padding-left: 20px; display: none">
+    <!-- <div id="qtyinput" style="padding-left: 20px; display: none">
       <p id="supplierHongIn" style="display: none; font-size: large">
         Hong In HCl drums
       </p>
@@ -227,16 +242,24 @@
       >
       <input id="CoaLines" type="number" style="width: 60px" />
       <button
-        id="btnqty"
+        id="btnqtyAGR"
         class="btn btn-primary"
-        style="width: 50px"
-        onclick="HongInLines()"
+        style="width: 80px"
+        onclick="HongInLinesAGR()"
       >
-        OK
+        AGRATE
+      </button>
+      <button
+        id="btnqtyCAT"
+        class="btn btn-primary"
+        style="width: 80px"
+        onclick="HongInLinesCAT()"
+      >
+        CATANIA
       </button>
     </div>
     <br />
-    <p id="qtyPagesHongIn" style="padding-left: 20px; display: none"></p>
+    <p id="qtyPagesHongIn" style="padding-left: 20px; display: none"></p> -->
     <!-- ------------------------------------- -->
     <!-- Chlorgas # of lines in ecOA -->
     <div id="qtyinputCS" style="padding-left: 20px; display: none">

@@ -14,8 +14,9 @@ const multer = require("multer");
 const path = require("path");
 var XMLWriter = require("xml-writer");
 var AdmZip = require("adm-zip");
+var pdf2table = require("pdf2table");
 
-var fileOriginale, numeroFileSample;
+var fileOriginale;
 // Uso multer per caricare file a scelta dalla mia directory. Solo pdf
 const storageMultiple = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -78,9 +79,7 @@ try {
       if (req.file == undefined) {
         res.redirect("index.html");
       } else {
-        //fileUploadCheck = "File uploaded OK";
         fileOriginale = req.file.originalname;
-        //console.log("fileUploadCheck", fileUploadCheck);
         var test = fileOriginale
           .substring(fileOriginale.length - 4)
           .toLowerCase();
@@ -97,6 +96,21 @@ try {
             //res.json(pdfData);
           });
           pdfParser.loadPDF(__dirname + "/" + fileOriginale.toString());
+
+          // -----------------pdf2table-----------------
+          fs.readFile(
+            __dirname + "/" + fileOriginale.toString(),
+            function (err, buffer) {
+              if (err) return console.log(err);
+
+              pdf2table.parse(buffer, function (err, rows, rowsdebug) {
+                if (err) return console.log(err);
+                fs.writeFileSync("sample2.json", JSON.stringify(rows));
+              });
+            }
+          );
+
+          //-----------------end pdf2table-------------------------
         }
         if (test === ".txt") {
           const readTxtFile = fs.readFileSync(fileOriginale, "utf-8");
@@ -113,24 +127,20 @@ try {
   console.log(err);
   return;
 }
-
 // Alimenta il contatore per 'shipmentNumber'
-app.post("/api", (request, response) => {
-  //const data = request.body;
-  try {
-    var prevCounter = fs.readFileSync("counter.txt", "utf8");
-    //console.log(prevCounter);
-    prevCounter++;
-    fs.writeFileSync("counter.txt", prevCounter.toString());
-    var afterCounter = fs.readFileSync("counter.txt", "utf8");
-    //console.log(afterCounter);
-  } catch (e) {
-    console.log("Error:", e.stack);
-  }
-  response.json(afterCounter);
+
+app.get("/apicounter", (req, res) => {
+  var testReadCounter = fs.readFileSync("counter.txt", "utf8");
+  res.send(testReadCounter);
 });
 
-// Wacker data generator to populate xml
+app.post("/newcounter", (req, res) => {
+  const newCounter = req.body;
+  fs.writeFileSync("counter.txt", newCounter.dataTest.toString());
+  res.json(newCounter.dataTest.toString());
+});
+
+// ----------WACKER POST-----------------
 app.post("/apitwo", (req, res) => {
   const dataWacker = req.body;
   //console.log(dataWacker);
@@ -138,16 +148,13 @@ app.post("/apitwo", (req, res) => {
   xw.startDocument("1.0", "UTF-8");
   xw.startElement("GasesShipment");
   xw.writeAttribute("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance");
-  xw.writeAttribute(
-    "xsi:noNamespaceSchemaLocation",
-    "3GASC250_DM00608712_06.xsd"
-  );
-  xw.writeAttribute("MaterialCode", "3GASC250");
+  xw.writeAttribute("xsi:noNamespaceSchemaLocation", dataWacker.nameSpace);
+  xw.writeAttribute("MaterialCode", dataWacker.partNumber);
   xw.writeAttribute("SupplierHoldingDesc", "LINDE PLC");
-  xw.writeAttribute("ReceivingStPlant", "Agrate");
-  xw.writeAttribute("MpsSpecNo", "DM00608712_06");
-  xw.writeAttribute("MpsSpecRev", "3.0");
-  xw.writeAttribute("ShipmentDate", dataWacker.shipment);
+  xw.writeAttribute("ReceivingStPlant", dataWacker.receivingPlant);
+  xw.writeAttribute("MpsSpecNo", dataWacker.materialSpec);
+  xw.writeAttribute("MpsSpecRev", dataWacker.revisionSpec);
+  xw.writeAttribute("ShipmentDate", dataWacker.shipmentdate);
   xw.writeAttribute("ShipmentNumber", dataWacker.shipmentNumber);
   xw.writeAttribute("ShipQty", 1);
   xw.startElement("Lot");
@@ -203,10 +210,12 @@ app.post("/apitwo", (req, res) => {
     console.log("Error:", e.stack);
   }
 });
+//------------END WACKER POST
 
+//-----------CHLORGAS POST-------------
 app.post("/apithree", (req, res) => {
   const dataCSPost = req.body;
-  // console.log(dataCSPost);
+  //console.log(dataCSPost);
   xw = new XMLWriter(true);
   xw.startDocument("1.0", "UTF-8");
   xw.startElement("GasesShipment");
@@ -284,7 +293,6 @@ app.post("/apithree", (req, res) => {
       fileNameArray[index] = fileNameArray[index].replace("/", "-");
       fileNameArray[index] = fileNameArray[index] + ".xml";
     }
-    //console.log("file to be dw", fileNameArray);
     fs.writeFileSync(CSfileToBeDownloaded, xw.toString());
     fs.writeFileSync("filename.txt", "");
     for (let index = 0; index < dataCSPost.filetext.length; index++) {
@@ -303,19 +311,321 @@ app.post("/apithree", (req, res) => {
   for (let index = 1; index < numeroFileSample.length; index++) {
     numeroFileSample[index] = numeroFileSample[index].replace("/", "-");
   }
-  //console.log("numeroFileSampleArray", numeroFileSample);
+
   for (let index = 0; index < numeroFileSample.length; index++) {
     zip.addLocalFile(numeroFileSample[index]);
   }
   zip.writeZip(/*target file name*/ "files.zip");
-  fs.writeFileSync("filename.txt", "");
+  //fs.writeFileSync("filename.txt", "");
 });
+//-----------END CHLORGAS POST-------------
+
+//-----------POST from Hongin AGR-------------
+app.post("/apifour", (req, res) => {
+  const dataHIPost = req.body;
+  //console.log(dataHIPost);
+  var zipHI = new AdmZip();
+  for (let i = 0; i < dataHIPost.filenamesHI.length; i++) {
+    xw = new XMLWriter(true);
+    xw.startDocument("1.0", "UTF-8");
+    xw.startElement("GasesShipment");
+    xw.writeAttribute("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance");
+    xw.writeAttribute(
+      "xsi:noNamespaceSchemaLocation",
+      "3GASCD26_DM0000775807_06.xsd"
+    );
+    xw.writeAttribute("MaterialCode", "3GASCD26");
+    xw.writeAttribute("SupplierHoldingDesc", "LINDE PLC");
+    xw.writeAttribute("ReceivingStPlant", "Agrate");
+    xw.writeAttribute("MpsSpecNo", "DM0000775807_06");
+    xw.writeAttribute("MpsSpecRev", "2.0");
+    xw.writeAttribute("ShipmentDate", dataHIPost.manDateHI[i]);
+    xw.writeAttribute("ShipmentNumber", dataHIPost.progressivoHI[i]);
+    xw.writeAttribute("ShipQty", 1);
+    xw.startElement("Lot");
+    xw.writeAttribute(
+      "SupplierSupplyChainSeqCode",
+      "LINDE PLC-HONG-IN CHEMICAL / Ulsan-1684"
+    );
+    xw.writeAttribute("ShipLotNo", dataHIPost.lotNumberHI[i]);
+    xw.writeAttribute("ExpiryDate", dataHIPost.expiryDateHI[i]);
+    xw.writeAttribute("MfgDate", dataHIPost.manDateHI[i]);
+    xw.writeAttribute("LotQty", 1);
+    xw.startElement("DIM_Carbon_dioxide_CO2");
+    xw.startElement("RAW");
+    xw.writeAttribute("VALUE", dataHIPost.HICO2value[i]);
+    xw.endElement();
+    xw.endElement("DIM_Carbon_dioxide_CO2");
+    xw.startElement("DIM_Carbon_monoxide_CO");
+    xw.startElement("RAW");
+    xw.writeAttribute("VALUE", dataHIPost.HICOvalue[i]);
+    xw.endElement();
+    xw.endElement("DIM_Carbon_monoxide_CO");
+    xw.startElement("DIM_Hydrogen_H2 ");
+    xw.startElement("RAW");
+    xw.writeAttribute("VALUE", dataHIPost.HIH2value[i]);
+    xw.endElement();
+    xw.endElement("DIM_Hydrogen_H2 ");
+    xw.startElement("DIM_Iron_Fe");
+    xw.startElement("RAW");
+    xw.writeAttribute("VALUE", dataHIPost.HIFevalue[i]);
+    xw.endElement();
+    xw.endElement("DIM_Iron_Fe");
+    xw.startElement("DIM_Moisture_H2O");
+    xw.startElement("RAW");
+    xw.writeAttribute("VALUE", dataHIPost.HIH2Ovalue[i]);
+    xw.endElement();
+    xw.endElement("DIM_Moisture_H2O");
+    xw.startElement("DIM_Nitrogen_N2 ");
+    xw.startElement("RAW");
+    xw.writeAttribute("VALUE", dataHIPost.HIN2value[i]);
+    xw.endElement();
+    xw.endElement("DIM_Nitrogen_N2 ");
+    xw.startElement("DIM_Oxygen_plus_argon_O2_plus_Ar ");
+    xw.startElement("RAW");
+    xw.writeAttribute("VALUE", dataHIPost.HIO2Arvalue[i]);
+    xw.endElement();
+    xw.endElement("DIM_Oxygen_plus_argon_O2_plus_Ar ");
+    xw.startElement("DIM_Methane_CH4 ");
+    xw.startElement("RAW");
+    xw.writeAttribute("VALUE", dataHIPost.HICH4value[i]);
+    xw.endElement();
+    xw.endElement("DIM_Methane_CH4 ");
+    xw.endDocument();
+    //console.log("AGR eCOA", xw.toString());
+
+    try {
+      var HIfileToBeDownloaded = dataHIPost.filenamesHI[i];
+      HIfileToBeDownloaded = HIfileToBeDownloaded.replace("/", "-");
+      HIfileToBeDownloaded = HIfileToBeDownloaded + ".xml";
+      //console.log("file to be dw", HIfileToBeDownloaded);
+      fs.writeFileSync(HIfileToBeDownloaded, xw.toString());
+      zipHI.addLocalFile(HIfileToBeDownloaded);
+    } catch (e) {
+      console.log("Error:", e.stack);
+    }
+  }
+  fs.writeFileSync("sourcename.txt", "HongInAGR");
+  zipHI.writeZip(/*target file name*/ "filesHIAGR.zip");
+});
+//-----------END POST from Hongin AGR-------------
+
+//-----------POST from Hongin CAT-------------
+
+app.post("/apifive", (req, res) => {
+  const dataHIPostCAT = req.body;
+  //console.log(dataHIPostCAT);
+  var zipHI = new AdmZip();
+  for (let i = 0; i < dataHIPostCAT.filenamesHI.length; i++) {
+    xw = new XMLWriter(true);
+    xw.startDocument("1.0", "UTF-8");
+    xw.startElement("GasesShipment");
+    xw.writeAttribute("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance");
+    xw.writeAttribute(
+      "xsi:noNamespaceSchemaLocation",
+      "3GASCD35_DM000811559_06.xsd"
+    );
+    xw.writeAttribute("MaterialCode", "3GASCD35");
+    xw.writeAttribute("SupplierHoldingDesc", "LINDE PLC");
+    xw.writeAttribute("ReceivingStPlant", "Catania");
+    xw.writeAttribute("MpsSpecNo", "DM000811559_06");
+    xw.writeAttribute("MpsSpecRev", "1.0");
+    xw.writeAttribute("ShipmentDate", dataHIPostCAT.manDateHI[i]);
+    xw.writeAttribute("ShipmentNumber", dataHIPostCAT.progressivoHI[i]);
+    xw.writeAttribute("ShipQty", 1);
+    xw.startElement("Lot");
+    xw.writeAttribute(
+      "SupplierSupplyChainSeqCode",
+      "LINDE PLC-HONG-IN CHEMICAL / Ulsan-1684"
+    );
+    xw.writeAttribute("ShipLotNo", dataHIPostCAT.lotNumberHI[i]);
+    xw.writeAttribute("ExpiryDate", dataHIPostCAT.expiryDateHI[i]);
+    xw.writeAttribute("MfgDate", dataHIPostCAT.manDateHI[i]);
+    xw.writeAttribute("LotQty", 1);
+    xw.startElement("DIM_Aluminum_Al");
+    xw.startElement("RAW");
+    xw.writeAttribute("VALUE", dataHIPostCAT.HIAlvalue[i]);
+    xw.endElement();
+    xw.endElement("DIM_Aluminum_Al");
+
+    xw.startElement("DIM_Antimony_Sb");
+    xw.startElement("RAW");
+    xw.writeAttribute("VALUE", dataHIPostCAT.HISbvalue[i]);
+    xw.endElement();
+    xw.endElement("DIM_Antimony_Sb");
+
+    xw.startElement("DIM_Arsenic_As");
+    xw.startElement("RAW");
+    xw.writeAttribute("VALUE", dataHIPostCAT.HIAsvalue[i]);
+    xw.endElement();
+    xw.endElement("DIM_Arsenic_As");
+
+    xw.startElement("DIM_Bismuth_Bi");
+    xw.startElement("RAW");
+    xw.writeAttribute("VALUE", dataHIPostCAT.HIBivalue[i]);
+    xw.endElement();
+    xw.endElement("DIM_Bismuth_Bi");
+
+    xw.startElement("DIM_Boron_B");
+    xw.startElement("RAW");
+    xw.writeAttribute("VALUE", dataHIPostCAT.HIBvalue[i]);
+    xw.endElement();
+    xw.endElement("DIM_Boron_B");
+
+    xw.startElement("DIM_Cadmium_Cd");
+    xw.startElement("RAW");
+    xw.writeAttribute("VALUE", dataHIPostCAT.HICdvalue[i]);
+    xw.endElement();
+    xw.endElement("DIM_Cadmium_Cd");
+
+    xw.startElement("DIM_Arsenic_As");
+    xw.startElement("RAW");
+    xw.writeAttribute("VALUE", dataHIPostCAT.HIAsvalue[i]);
+    xw.endElement();
+    xw.endElement("DIM_Arsenic_As");
+
+    xw.startElement("DIM_Carbon_dioxide_CO2");
+    xw.startElement("RAW");
+    xw.writeAttribute("VALUE", dataHIPostCAT.HICO2value[i]);
+    xw.endElement();
+    xw.endElement("DIM_Carbon_dioxide_CO2");
+    xw.startElement("DIM_Carbon_monoxide_CO");
+    xw.startElement("RAW");
+    xw.writeAttribute("VALUE", dataHIPostCAT.HICOvalue[i]);
+    xw.endElement();
+    xw.endElement("DIM_Carbon_monoxide_CO");
+
+    xw.startElement("DIM_Chromium_Cr");
+    xw.startElement("RAW");
+    xw.writeAttribute("VALUE", dataHIPostCAT.HICrvalue[i]);
+    xw.endElement();
+    xw.endElement("DIM_Chromium_Cr");
+
+    xw.startElement("DIM_Cobalt_Co");
+    xw.startElement("RAW");
+    xw.writeAttribute("VALUE", dataHIPostCAT.HICovalue[i]);
+    xw.endElement();
+    xw.endElement("DIM_Cobalt_Co");
+
+    xw.startElement("DIM_Copper_Cu");
+    xw.startElement("RAW");
+    xw.writeAttribute("VALUE", dataHIPostCAT.HICuvalue[i]);
+    xw.endElement();
+    xw.endElement("DIM_Copper_Cu");
+
+    xw.startElement("DIM_Hydrogen_H2 ");
+    xw.startElement("RAW");
+    xw.writeAttribute("VALUE", dataHIPostCAT.HIH2value[i]);
+    xw.endElement();
+    xw.endElement("DIM_Hydrogen_H2 ");
+    xw.startElement("DIM_Iron_Fe");
+    xw.startElement("RAW");
+    xw.writeAttribute("VALUE", dataHIPostCAT.HIFevalue[i]);
+    xw.endElement();
+    xw.endElement("DIM_Iron_Fe");
+
+    xw.startElement("DIM_Lead_Pb");
+    xw.startElement("RAW");
+    xw.writeAttribute("VALUE", dataHIPostCAT.HIPbvalue[i]);
+    xw.endElement();
+    xw.endElement("DIM_Lead_Pb");
+
+    xw.startElement("DIM_Arsenic_As");
+    xw.startElement("RAW");
+    xw.writeAttribute("VALUE", dataHIPostCAT.HIAsvalue[i]);
+    xw.endElement();
+    xw.endElement("DIM_Arsenic_As");
+
+    xw.startElement("DIM_Moisture_H2O");
+    xw.startElement("RAW");
+    xw.writeAttribute("VALUE", dataHIPostCAT.HIH2Ovalue[i]);
+    xw.endElement();
+    xw.endElement("DIM_Moisture_H2O");
+
+    xw.startElement("DIM_Molybdenum_Mo");
+    xw.startElement("RAW");
+    xw.writeAttribute("VALUE", dataHIPostCAT.HIMovalue[i]);
+    xw.endElement();
+    xw.endElement("DIM_Molybdenum_Mo");
+
+    xw.startElement("DIM_Nickel_Ni");
+    xw.startElement("RAW");
+    xw.writeAttribute("VALUE", dataHIPostCAT.HINivalue[i]);
+    xw.endElement();
+    xw.endElement("DIM_Nickel_Ni");
+
+    xw.startElement("DIM_Nitrogen_N2 ");
+    xw.startElement("RAW");
+    xw.writeAttribute("VALUE", dataHIPostCAT.HIN2value[i]);
+    xw.endElement();
+    xw.endElement("DIM_Nitrogen_N2 ");
+    xw.startElement("DIM_Oxygen_plus_argon_O2_plus_Ar ");
+    xw.startElement("RAW");
+    xw.writeAttribute("VALUE", dataHIPostCAT.HIO2Arvalue[i]);
+    xw.endElement();
+    xw.endElement("DIM_Oxygen_plus_argon_O2_plus_Ar ");
+
+    xw.startElement("DIM_Phosphorous_P");
+    xw.startElement("RAW");
+    xw.writeAttribute("VALUE", dataHIPostCAT.HIPvalue[i]);
+    xw.endElement();
+    xw.endElement("DIM_Phosphorous_P");
+
+    xw.startElement("DIM_Sodium_Na");
+    xw.startElement("RAW");
+    xw.writeAttribute("VALUE", dataHIPostCAT.HIAsvalue[i]);
+    xw.endElement();
+    xw.endElement("DIM_Sodium_Na");
+
+    xw.startElement("DIM_Methane_CH4 ");
+    xw.startElement("RAW");
+    xw.writeAttribute("VALUE", dataHIPostCAT.HICH4value[i]);
+    xw.endElement();
+    xw.endElement("DIM_Methane_CH4 ");
+    xw.endDocument();
+
+    //console.log("CAT eCOA", xw.toString());
+
+    try {
+      var HIfileToBeDownloaded = dataHIPostCAT.filenamesHI[i];
+      HIfileToBeDownloaded = HIfileToBeDownloaded.replace("/", "-");
+      HIfileToBeDownloaded = HIfileToBeDownloaded + ".xml";
+      //console.log("file to be dw", HIfileToBeDownloaded);
+      fs.writeFileSync(HIfileToBeDownloaded, xw.toString());
+      zipHI.addLocalFile(HIfileToBeDownloaded);
+    } catch (e) {
+      console.log("Error:", e.stack);
+    }
+  }
+  fs.writeFileSync("sourcename.txt", "HongInCAT");
+  zipHI.writeZip(/*target file name*/ "filesHICAT.zip");
+});
+
+//-----------END POST from Hongin AGR-------------
 
 app.get("/download", function (req, res) {
   var sourceName = fs.readFileSync("sourcename.txt", "utf-8");
   //console.log("sourcename", sourceName);
   if (sourceName === "Chlorgas") {
     res.download("files.zip", function (err) {
+      if (err) {
+        console.log("file not downloaded");
+      } else {
+        console.log("Download succesfull");
+      }
+    });
+  }
+  if (sourceName === "HongInAGR") {
+    res.download("filesHIAGR.zip", function (err) {
+      if (err) {
+        console.log("file not downloaded");
+      } else {
+        console.log("Download succesfull");
+      }
+    });
+  }
+  if (sourceName === "HongInCAT") {
+    res.download("filesHICAT.zip", function (err) {
       if (err) {
         console.log("file not downloaded");
       } else {
@@ -336,27 +646,19 @@ app.get("/download", function (req, res) {
   }
 });
 
-/* app.get("/download", function (req, res) {
-  var numeroFileSample = fs.readFileSync("filename.txt", "utf-8");
-  CSfileToBeDownloaded = numeroFileSample;
-  //CSfileToBeDownloaded = CSfileToBeDownloaded.replace("/", "-");
-  //CSfileToBeDownloaded = CSfileToBeDownloaded + ".xml";
-  console.log("fileToBeDownloaded", CSfileToBeDownloaded);
-  res.download(CSfileToBeDownloaded, function (err) {
-    if (err) {
-      console.log("file not downloaded");
-    } else {
-      console.log("Download succesfull");
-    }
-  });
-}); */
-
 // legge il file sample.json e lo manda a public/index.js
 app.get("/jsonSampleFile", (req, res) => {
   let jsonData = fs.readFileSync("sample.json");
   let jsonFile = JSON.parse(jsonData);
   //console.log(jsonFile);
   res.send(jsonFile);
+});
+
+app.get("/jsonSampleFile2", (req, res) => {
+  let jsonData2 = fs.readFileSync("sample2.json");
+  let jsonFile2 = JSON.parse(jsonData2);
+  //console.log(jsonFile2);
+  res.send(jsonFile2);
 });
 
 app.get("/txt", (req, res) => {
