@@ -163,42 +163,83 @@ app.post("/apitwo", (req, res) => {
   xw.writeAttribute("ExpiryDate", dataWacker.expiryDate);
   xw.writeAttribute("MfgDate", dataWacker.manDate);
   xw.writeAttribute("LotQty", 1);
-  xw.startElement("DIM_Carbon_dioxide_CO2");
-  xw.startElement("RAW");
-  xw.writeAttribute("VALUE", dataWacker.CO2value);
-  xw.endElement();
-  xw.endElement("DIM_Carbon_dioxide_CO2");
-  xw.startElement("DIM_Carbon_monoxide_CO");
-  xw.startElement("RAW");
-  xw.writeAttribute("VALUE", dataWacker.COvalue);
-  xw.endElement();
-  xw.endElement("DIM_Carbon_monoxide_CO");
-  xw.startElement("DIM_Iron_Fe");
-  xw.startElement("RAW");
-  xw.writeAttribute("VALUE", dataWacker.Fevalue);
-  xw.endElement();
-  xw.endElement("DIM_Iron_Fe");
-  xw.startElement("DIM_Moisture_H2O");
-  xw.startElement("RAW");
-  xw.writeAttribute("VALUE", dataWacker.H2Ovalue);
-  xw.endElement();
-  xw.endElement("DIM_Moisture_H2O");
-  xw.startElement("DIM_Nitrogen_N2 ");
-  xw.startElement("RAW");
-  xw.writeAttribute("VALUE", dataWacker.N2value);
-  xw.endElement();
-  xw.endElement("DIM_Nitrogen_N2 ");
-  xw.startElement("DIM_Oxygen_plus_argon_O2_plus_Ar ");
-  xw.startElement("RAW");
-  xw.writeAttribute("VALUE", dataWacker.O2Arvalue);
-  xw.endElement();
-  xw.endElement("DIM_Oxygen_plus_argon_O2_plus_Ar ");
-  xw.startElement("DIM_Total_hydrocarbon_as_CH4 ");
-  xw.startElement("RAW");
-  xw.writeAttribute("VALUE", dataWacker.CH4value);
-  xw.endElement();
-  xw.endElement("DIM_Total_hydrocarbon_as_CH4 ");
-  xw.endDocument();
+  if (dataWacker.receivingPlant === "Agrate") {
+    xw.startElement("DIM_Carbon_dioxide_CO2");
+    xw.startElement("RAW");
+    xw.writeAttribute("VALUE", dataWacker.CO2value);
+    xw.endElement();
+    xw.endElement("DIM_Carbon_dioxide_CO2");
+    xw.startElement("DIM_Carbon_monoxide_CO");
+    xw.startElement("RAW");
+    xw.writeAttribute("VALUE", dataWacker.COvalue);
+    xw.endElement();
+    xw.endElement("DIM_Carbon_monoxide_CO");
+    xw.startElement("DIM_Iron_Fe");
+    xw.startElement("RAW");
+    xw.writeAttribute("VALUE", dataWacker.Fevalue);
+    xw.endElement();
+    xw.endElement("DIM_Iron_Fe");
+    xw.startElement("DIM_Moisture_H2O");
+    xw.startElement("RAW");
+    xw.writeAttribute("VALUE", dataWacker.H2Ovalue);
+    xw.endElement();
+    xw.endElement("DIM_Moisture_H2O");
+    xw.startElement("DIM_Nitrogen_N2 ");
+    xw.startElement("RAW");
+    xw.writeAttribute("VALUE", dataWacker.N2value);
+    xw.endElement();
+    xw.endElement("DIM_Nitrogen_N2 ");
+    xw.startElement("DIM_Oxygen_plus_argon_O2_plus_Ar ");
+    xw.startElement("RAW");
+    xw.writeAttribute("VALUE", dataWacker.O2Arvalue);
+    xw.endElement();
+    xw.endElement("DIM_Oxygen_plus_argon_O2_plus_Ar ");
+    xw.startElement("DIM_Total_hydrocarbon_as_CH4 ");
+    xw.startElement("RAW");
+    xw.writeAttribute("VALUE", dataWacker.CH4value);
+    xw.endElement();
+    xw.endElement("DIM_Total_hydrocarbon_as_CH4 ");
+    xw.endDocument();
+  }
+
+  if (dataWacker.receivingPlant === "Catania") {
+    xw.startElement("DIM_Nitrogen_N2 ");
+    xw.startElement("RAW");
+    xw.writeAttribute("VALUE", dataWacker.N2value);
+    xw.endElement();
+    xw.endElement("DIM_Nitrogen_N2 ");
+    xw.startElement("DIM_Carbon_dioxide_CO2");
+    xw.startElement("RAW");
+    xw.writeAttribute("VALUE", dataWacker.CO2value);
+    xw.endElement();
+    xw.endElement("DIM_Carbon_dioxide_CO2");
+    xw.startElement("DIM_Carbon_monoxide_CO");
+    xw.startElement("RAW");
+    xw.writeAttribute("VALUE", dataWacker.COvalue);
+    xw.endElement();
+    xw.endElement("DIM_Carbon_monoxide_CO");
+    xw.startElement("DIM_Total_hydrocarbon_as_CH4 ");
+    xw.startElement("RAW");
+    xw.writeAttribute("VALUE", dataWacker.CH4value);
+    xw.endElement();
+    xw.endElement("DIM_Total_hydrocarbon_as_CH4 ");
+    xw.startElement("DIM_Moisture_H2O");
+    xw.startElement("RAW");
+    xw.writeAttribute("VALUE", dataWacker.H2Ovalue);
+    xw.endElement();
+    xw.endElement("DIM_Moisture_H2O");
+    xw.startElement("DIM_Oxygen_plus_argon_O2_plus_Ar ");
+    xw.startElement("RAW");
+    xw.writeAttribute("VALUE", dataWacker.O2Arvalue);
+    xw.endElement();
+    xw.endElement("DIM_Oxygen_plus_argon_O2_plus_Ar ");
+    xw.startElement("DIM_Iron_Fe");
+    xw.startElement("RAW");
+    xw.writeAttribute("VALUE", dataWacker.Fevalue);
+    xw.endElement();
+    xw.endElement("DIM_Iron_Fe");
+    xw.endDocument();
+  }
 
   try {
     fs.writeFileSync("sourcename.txt", "Wacker");
@@ -216,107 +257,88 @@ app.post("/apitwo", (req, res) => {
 app.post("/apithree", (req, res) => {
   const dataCSPost = req.body;
   //console.log(dataCSPost);
-  xw = new XMLWriter(true);
-  xw.startDocument("1.0", "UTF-8");
-  xw.startElement("GasesShipment");
-  xw.writeAttribute("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance");
-  xw.writeAttribute(
-    "xsi:noNamespaceSchemaLocation",
-    "3GASCD26_DM00822093_09.xsd"
-  );
-  xw.writeAttribute("MaterialCode", "3GASCD26");
-  xw.writeAttribute("SupplierHoldingDesc", "LINDE PLC");
-  xw.writeAttribute("ReceivingStPlant", "Agrate");
-  xw.writeAttribute("MpsSpecNo", "DM00822093_09");
-  xw.writeAttribute("MpsSpecRev", "1.0");
-  xw.writeAttribute("ShipmentDate", dataCSPost.shipment);
-  xw.writeAttribute("ShipmentNumber", dataCSPost.progressivoCS);
-  xw.writeAttribute("ShipQty", 1);
-  xw.startElement("Lot");
-  xw.writeAttribute(
-    "SupplierSupplyChainSeqCode",
-    "LINDE PLC-S/ CHLORGAS - Bitterfeld-Wolfen-1784"
-  );
-  xw.writeAttribute("ShipLotNo", dataCSPost.lotNumber);
-  xw.writeAttribute("ExpiryDate", dataCSPost.expiryDate);
-  xw.writeAttribute("MfgDate", dataCSPost.shipment);
-  xw.writeAttribute("LotQty", 1);
-  xw.startElement("DIM_Carbon_dioxide_CO2");
-  xw.startElement("RAW");
-  xw.writeAttribute("VALUE", "1.8");
-  xw.endElement();
-  xw.endElement("DIM_Carbon_dioxide_CO2");
-  xw.startElement("DIM_Carbon_monoxide_CO");
-  xw.startElement("RAW");
-  xw.writeAttribute("VALUE", "6.0");
-  xw.endElement();
-  xw.endElement("DIM_Carbon_monoxide_CO");
-  xw.startElement("DIM_Iron_Fe");
-  xw.startElement("RAW");
-  xw.writeAttribute("VALUE", "0.4");
-  xw.endElement();
-  xw.endElement("DIM_Iron_Fe");
-  xw.startElement("DIM_Methane_CH4 ");
-  xw.startElement("RAW");
-  xw.writeAttribute("VALUE", "0.8");
-  xw.endElement();
-  xw.endElement("DIM_Methane_CH4 ");
-  xw.startElement("DIM_Moisture_H2O");
-  xw.startElement("RAW");
-  xw.writeAttribute("VALUE", "1.8");
-  xw.endElement();
-  xw.endElement("DIM_Moisture_H2O");
-  xw.startElement("DIM_Nitrogen_N2 ");
-  xw.startElement("RAW");
-  xw.writeAttribute("VALUE", "2.0");
-  xw.endElement();
-  xw.endElement("DIM_Nitrogen_N2 ");
-  xw.startElement("DIM_Oxygen_plus_argon_O2_plus_Ar ");
-  xw.startElement("RAW");
-  xw.writeAttribute("VALUE", "2.0");
-  xw.endElement();
-  xw.endElement("DIM_Oxygen_plus_argon_O2_plus_Ar ");
-  xw.startElement("DIM_Hydrogen_H2 ");
-  xw.startElement("RAW");
-  xw.writeAttribute("VALUE", "5.0");
-  xw.endElement();
-  xw.endElement("DIM_Hydrogen_H2 ");
-  xw.endDocument();
+  var zipCS = new AdmZip();
+  for (let i = 0; i < dataCSPost.lotNumber.length; i++) {
+    xw = new XMLWriter(true);
+    xw.startDocument("1.0", "UTF-8");
+    xw.startElement("GasesShipment");
+    xw.writeAttribute("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance");
+    xw.writeAttribute(
+      "xsi:noNamespaceSchemaLocation",
+      "3GASCD26_DM00822093_09.xsd"
+    );
+    xw.writeAttribute("MaterialCode", "3GASCD26");
+    xw.writeAttribute("SupplierHoldingDesc", "LINDE PLC");
+    xw.writeAttribute("ReceivingStPlant", "Agrate");
+    xw.writeAttribute("MpsSpecNo", "DM00822093_09");
+    xw.writeAttribute("MpsSpecRev", "1.0");
+    xw.writeAttribute("ShipmentDate", dataCSPost.shipment[i]);
+    xw.writeAttribute("ShipmentNumber", dataCSPost.progressivoCS[i]);
+    xw.writeAttribute("ShipQty", 1);
+    xw.startElement("Lot");
+    xw.writeAttribute(
+      "SupplierSupplyChainSeqCode",
+      "LINDE PLC-S/ CHLORGAS - Bitterfeld-Wolfen-1784"
+    );
+    xw.writeAttribute("ShipLotNo", dataCSPost.lotNumber[i]);
+    xw.writeAttribute("ExpiryDate", dataCSPost.expiryDate[i]);
+    xw.writeAttribute("MfgDate", dataCSPost.shipment[i]);
+    xw.writeAttribute("LotQty", 1);
+    xw.startElement("DIM_Carbon_dioxide_CO2");
+    xw.startElement("RAW");
+    xw.writeAttribute("VALUE", "1.8");
+    xw.endElement();
+    xw.endElement("DIM_Carbon_dioxide_CO2");
+    xw.startElement("DIM_Carbon_monoxide_CO");
+    xw.startElement("RAW");
+    xw.writeAttribute("VALUE", "6.0");
+    xw.endElement();
+    xw.endElement("DIM_Carbon_monoxide_CO");
+    xw.startElement("DIM_Iron_Fe");
+    xw.startElement("RAW");
+    xw.writeAttribute("VALUE", "0.4");
+    xw.endElement();
+    xw.endElement("DIM_Iron_Fe");
+    xw.startElement("DIM_Methane_CH4 ");
+    xw.startElement("RAW");
+    xw.writeAttribute("VALUE", "0.8");
+    xw.endElement();
+    xw.endElement("DIM_Methane_CH4 ");
+    xw.startElement("DIM_Moisture_H2O");
+    xw.startElement("RAW");
+    xw.writeAttribute("VALUE", "1.8");
+    xw.endElement();
+    xw.endElement("DIM_Moisture_H2O");
+    xw.startElement("DIM_Nitrogen_N2 ");
+    xw.startElement("RAW");
+    xw.writeAttribute("VALUE", "2.0");
+    xw.endElement();
+    xw.endElement("DIM_Nitrogen_N2 ");
+    xw.startElement("DIM_Oxygen_plus_argon_O2_plus_Ar ");
+    xw.startElement("RAW");
+    xw.writeAttribute("VALUE", "2.0");
+    xw.endElement();
+    xw.endElement("DIM_Oxygen_plus_argon_O2_plus_Ar ");
+    xw.startElement("DIM_Hydrogen_H2 ");
+    xw.startElement("RAW");
+    xw.writeAttribute("VALUE", "5.0");
+    xw.endElement();
+    xw.endElement("DIM_Hydrogen_H2 ");
+    xw.endDocument();
 
-  try {
-    fs.writeFileSync("sourcename.txt", "Chlorgas");
-    var CSfileToBeDownloaded = dataCSPost.lotNumber;
-    CSfileToBeDownloaded = CSfileToBeDownloaded.replace("/", "-");
-    CSfileToBeDownloaded = CSfileToBeDownloaded + ".xml";
-    var fileNameArray = dataCSPost.filetext;
-    for (let index = 0; index < dataCSPost.filetext.length; index++) {
-      fileNameArray[index] = fileNameArray[index].replace("/", "-");
-      fileNameArray[index] = fileNameArray[index] + ".xml";
+    try {
+      var fileToBeDownloaded = dataCSPost.filetext[i];
+      fileToBeDownloaded = fileToBeDownloaded.replace("/", "-");
+      fileToBeDownloaded = fileToBeDownloaded + ".xml";
+      //console.log("file to be dw", fileToBeDownloaded);
+      fs.writeFileSync(fileToBeDownloaded, xw.toString());
+      zipCS.addLocalFile(fileToBeDownloaded);
+    } catch (e) {
+      console.log("Error:", e.stack);
     }
-    fs.writeFileSync(CSfileToBeDownloaded, xw.toString());
-    fs.writeFileSync("filename.txt", "");
-    for (let index = 0; index < dataCSPost.filetext.length; index++) {
-      fs.appendFileSync(
-        "filename.txt",
-        "\n" + dataCSPost.filetext[index].toString()
-      );
-    }
-  } catch (e) {
-    console.log("Error:", e.stack);
   }
-  var zip = new AdmZip();
-  var numeroFileSample = fs.readFileSync("filename.txt", "utf-8");
-  numeroFileSample = numeroFileSample.split("\n");
-  var numeroFileSampleCS = numeroFileSample.shift();
-  for (let index = 1; index < numeroFileSample.length; index++) {
-    numeroFileSample[index] = numeroFileSample[index].replace("/", "-");
-  }
-
-  for (let index = 0; index < numeroFileSample.length; index++) {
-    zip.addLocalFile(numeroFileSample[index]);
-  }
-  zip.writeZip(/*target file name*/ "files.zip");
-  //fs.writeFileSync("filename.txt", "");
+  fs.writeFileSync("sourcename.txt", "Chlorgas");
+  zipCS.writeZip(/*target file name*/ "filesCS.zip");
 });
 //-----------END CHLORGAS POST-------------
 
@@ -601,13 +623,102 @@ app.post("/apifive", (req, res) => {
   zipHI.writeZip(/*target file name*/ "filesHICAT.zip");
 });
 
-//-----------END POST from Hongin AGR-------------
+//-----------END POST from Hongin CAT-------------
+
+//-----------POST from TCS BURGHUASEN-------------
+
+app.post("/TCS", (req, res) => {
+  const dataTCSPost = req.body;
+  //console.log(dataTCSPost);
+  var zipTCS = new AdmZip();
+  for (let i = 0; i < dataTCSPost.filenamesTCSB.length; i++) {
+    xw = new XMLWriter(true);
+    xw.startDocument("1.0", "UTF-8");
+    xw.startElement("GasesShipment");
+    xw.writeAttribute("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance");
+    xw.writeAttribute(
+      "xsi:noNamespaceSchemaLocation",
+      "2CAG1211_DM00423514_09.xsd"
+    );
+    xw.writeAttribute("MaterialCode", "2CAG1211");
+    xw.writeAttribute("SupplierHoldingDesc", "LINDE PLC");
+    xw.writeAttribute("ReceivingStPlant", dataTCSPost.plant);
+    xw.writeAttribute("MpsSpecNo", "DM00423514_09");
+    xw.writeAttribute("MpsSpecRev", "3.0");
+    xw.writeAttribute("ShipmentDate", dataTCSPost.shipmentDateTCSB);
+    xw.writeAttribute("ShipmentNumber", dataTCSPost.progressivoTCSB[i]);
+    xw.writeAttribute("ShipQty", 1);
+    xw.startElement("Lot");
+    xw.writeAttribute(
+      "SupplierSupplyChainSeqCode",
+      "LINDE PLC-BURGHAUSEN-1282"
+    );
+    xw.writeAttribute("ShipLotNo", dataTCSPost.filenamesTCSB[i]);
+    xw.writeAttribute("ExpiryDate", dataTCSPost.expiryDateTCSB);
+    xw.writeAttribute("MfgDate", dataTCSPost.manDateTCSB);
+    xw.writeAttribute("LotQty", 1);
+
+    xw.startElement("DIM_Acceptors_B");
+    xw.startElement("RAW");
+    xw.writeAttribute("VALUE", dataTCSPost.TCSBvalue);
+    xw.endElement();
+    xw.endElement("DIM_Acceptors_B");
+
+    xw.startElement("DIM_Aluminum_Al");
+    xw.startElement("RAW");
+    xw.writeAttribute("VALUE", dataTCSPost.TCSAlvalue);
+    xw.endElement();
+    xw.endElement("DIM_Aluminum_Al");
+
+    xw.startElement("DIM_Donors_P_As_Sb");
+    xw.startElement("RAW");
+    xw.writeAttribute("VALUE", dataTCSPost.TCSPAsSbvalue);
+    xw.endElement();
+    xw.endElement("DIM_Donors_P_As_Sb");
+
+    xw.startElement("DIM_Iron_Fe_Liquid_phase");
+    xw.startElement("RAW");
+    xw.writeAttribute("VALUE", dataTCSPost.TCSFevalue);
+    xw.endElement();
+    xw.endElement("DIM_Iron_Fe_Liquid_phase");
+
+    xw.startElement("DIM_Carbon_C");
+    xw.startElement("RAW");
+    xw.writeAttribute("VALUE", dataTCSPost.TCSCvalue);
+    xw.endElement();
+    xw.endElement("DIM_Carbon_C");
+
+    xw.startElement("DIM_Trichlorosilane_HSiCl3_Assay");
+    xw.startElement("RAW");
+    xw.writeAttribute("VALUE", dataTCSPost.TCSAssay);
+    xw.endElement();
+    xw.endElement("DIM_Trichlorosilane_HSiCl3_Assay");
+    xw.endDocument();
+
+    //console.log("TCS eCOA", xw.toString());
+
+    try {
+      var TCSfileToBeDownloaded = dataTCSPost.filenamesTCSB[i];
+      TCSfileToBeDownloaded = TCSfileToBeDownloaded.replace("/", "-");
+      TCSfileToBeDownloaded = TCSfileToBeDownloaded + ".xml";
+      //console.log("file to be dw", HIfileToBeDownloaded);
+      fs.writeFileSync(TCSfileToBeDownloaded, xw.toString());
+      zipTCS.addLocalFile(TCSfileToBeDownloaded);
+    } catch (e) {
+      console.log("Error:", e.stack);
+    }
+  }
+  fs.writeFileSync("sourcename.txt", "TCS Burghausen");
+  zipTCS.writeZip(/*target file name*/ "filesTCS.zip");
+});
+
+//-----------END POST from TCS BURGHAUSEN-------------
 
 app.get("/download", function (req, res) {
   var sourceName = fs.readFileSync("sourcename.txt", "utf-8");
   //console.log("sourcename", sourceName);
   if (sourceName === "Chlorgas") {
-    res.download("files.zip", function (err) {
+    res.download("filesCS.zip", function (err) {
       if (err) {
         console.log("file not downloaded");
       } else {
@@ -626,6 +737,15 @@ app.get("/download", function (req, res) {
   }
   if (sourceName === "HongInCAT") {
     res.download("filesHICAT.zip", function (err) {
+      if (err) {
+        console.log("file not downloaded");
+      } else {
+        console.log("Download succesfull");
+      }
+    });
+  }
+  if (sourceName === "TCS Burghausen") {
+    res.download("filesTCS.zip", function (err) {
       if (err) {
         console.log("file not downloaded");
       } else {

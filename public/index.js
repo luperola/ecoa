@@ -3,8 +3,9 @@ var myDate,
   shipmentNumberW,
   shipmentNumberHI,
   shipmentNumberCS,
-  shNumberTest,
-  nuovoCounter;
+  shipmentNumberTCSB,
+  lotNumberTCSB,
+  manDateTCSB;
 let testMatrixCS1 = [],
   testMatrixCS2 = [],
   mfgDateCS = [],
@@ -14,6 +15,7 @@ let testMatrixCS1 = [],
   shNumberW = [],
   shNumberCS = [],
   shNumberHI = [],
+  shNumberTCS = [],
   arrayHI = [],
   shNumberHICAT = [],
   arrayShN = [],
@@ -758,113 +760,45 @@ function WackerHCl(
 //---------------- END WACKER ----------------------
 
 //--------------TCS Burghausen-----------------------
-function TCSBurghausen() {
+function TCSBurghausenAGR() {
+  var receivingPlant = "Agrate";
+  TCSBurghausen(receivingPlant);
+}
+function TCSBurghausenCAT() {
+  var receivingPlant = "Catania";
+  TCSBurghausen(receivingPlant);
+}
+function TCSBurghausen(receivingPlant) {
   document.getElementById("btndropdown").style.display = "none";
   document.getElementById("supplierWacker").style.display = "inline";
   document.getElementById("modalCS").style.display = "none";
-  ReadFileJson();
-  async function ReadFileJson() {
-    const res = await fetch("/jsonSampleFile");
-    const data = await res.json();
-    //Counter alimenta e salva il contatore di counter.txt
-    Counter();
-    async function Counter() {
-      let contatore;
-      const options = {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(contatore),
-      };
-      const myresponse = await fetch("/api", options);
-      var myjson = await myresponse.json();
-      myjson = parseInt(myjson);
-      var dt = new Date();
-      var anno = dt.getFullYear().toString();
-      anno = anno.substring(2, 4);
-      if (myjson < 10) {
-        shipmentNumber = "IT/000" + myjson.toString() + "/" + anno;
-      }
-      if (myjson >= 10 && myjson < 100) {
-        shipmentNumber = "IT/00" + myjson.toString() + "/" + anno;
-      }
-      if (myjson >= 100 && myjson < 1000) {
-        shipmentNumber = "IT/0" + myjson.toString() + "/" + anno;
-      }
-      if (myjson >= 1000) {
-        shipmentNumber = "IT/" + myjson.toString() + "/" + anno;
-      }
-      if (myjson > 10000) {
-        alert("reset counter.txt file");
-      }
-      window.localStorage.setItem("shipment", shipmentNumber);
+  document.getElementById("btndown").style.display = "inline";
+  document.getElementById("btnHome").style.display = "inline";
+  ReadTCSB();
+  async function ReadTCSB() {
+    const response = await fetch("/jsonSampleFile2");
+    var dataTCSB = await response.json();
+    //console.log("data TCSB", dataTCSB);
+
+    var test = dataTCSB[21].length;
+
+    if (test === 13) {
+      lotNumberTCSB = dataTCSB[21][10] + dataTCSB[21][11] + dataTCSB[21][12];
+      manDateTCSB =
+        dataTCSB[21][3] + dataTCSB[21][4] + dataTCSB[21][5] + dataTCSB[21][6];
     }
-    const shipmentNumber1 = window.localStorage.getItem("shipment");
+    if (test === 14) {
+      lotNumberTCSB = dataTCSB[21][11] + dataTCSB[21][12] + dataTCSB[21][13];
+      manDateTCSB =
+        dataTCSB[21][3] +
+        dataTCSB[21][4] +
+        dataTCSB[21][5] +
+        dataTCSB[21][6] +
+        dataTCSB[21][7];
+    }
 
-    var wackerData = {
-      shipmentNumber: shipmentNumber1,
-      shipmentdate: data.Pages[0].Texts[22].R[0].T,
-      lotNumber: data.Pages[0].Texts[42].R[0].T,
-      expiryDate: data.Pages[0].Texts[50].R[0].T,
-      manDate: data.Pages[0].Texts[47].R[0].T,
-      N2value: data.Pages[0].Texts[79].R[0].T,
-      O2Arvalue: data.Pages[0].Texts[86].R[0].T,
-      CO2value: data.Pages[0].Texts[93].R[0].T,
-      COvalue: data.Pages[0].Texts[100].R[0].T,
-      CH4value: data.Pages[0].Texts[107].R[0].T,
-      H2value: data.Pages[0].Texts[114].R[0].T,
-      H2Ovalue: data.Pages[0].Texts[121].R[0].T,
-      Fevalue: data.Pages[0].Texts[128].R[0].T,
-    };
-    wackerData.shipmentdate = wackerData.shipmentdate.replace(
-      "date%20of%20issue%3A%20",
-      ""
-    );
-    wackerData.shipmentdate = wackerData.shipmentdate.replaceAll(".", "-");
-    const month = parseInt(wackerData.shipmentdate.substring(3, 5)) - 1;
-    const monthName = [
-      "Jan",
-      "Feb",
-      "Mar",
-      "Apr",
-      "May",
-      "Jun",
-      "Jul",
-      "Aug",
-      "Sep",
-      "Oct",
-      "Nov",
-      "Dec",
-    ];
-    wackerData.shipmentdate = wackerData.shipmentdate.replace(
-      wackerData.shipmentdate.substring(3, 5),
-      monthName[month]
-    );
-
-    wackerData.expiryDate = wackerData.expiryDate.replaceAll(".", "-");
-    const monthExpiry = parseInt(wackerData.expiryDate.substring(3, 5)) - 1;
-    const monthNameExpiry = [
-      "Jan",
-      "Feb",
-      "Mar",
-      "Apr",
-      "May",
-      "Jun",
-      "Jul",
-      "Aug",
-      "Sep",
-      "Oct",
-      "Nov",
-      "Dec",
-    ];
-    wackerData.expiryDate = wackerData.expiryDate.replace(
-      wackerData.expiryDate.substring(3, 5),
-      monthNameExpiry[monthExpiry]
-    );
-
-    wackerData.manDate = wackerData.manDate.replaceAll(".", "-");
-    const monthMan = parseInt(wackerData.manDate.substring(3, 5)) - 1;
+    manDateTCSB = manDateTCSB.replaceAll(".", "-");
+    const monthMan = parseInt(manDateTCSB.substring(3, 5)) - 1;
     const monthNameMan = [
       "Jan",
       "Feb",
@@ -879,62 +813,153 @@ function TCSBurghausen() {
       "Nov",
       "Dec",
     ];
-    wackerData.manDate = wackerData.manDate.replace(
-      wackerData.manDate.substring(3, 5),
-      monthNameMan[monthMan]
-    );
+    manDateTCSB =
+      manDateTCSB.substring(0, 3) +
+      monthNameMan[monthMan] +
+      manDateTCSB.substring(5, 10);
 
-    wackerData.N2value = wackerData.N2value.replace("%3C%20", "");
-    wackerData.O2Arvalue = wackerData.O2Arvalue.replace("%3C%20", "");
-    wackerData.CO2value = wackerData.CO2value.replace("%3C%20", "");
-    wackerData.COvalue = wackerData.COvalue.replace("%3C%20", "");
-    wackerData.CH4value = wackerData.CH4value.replace("%3C%20", "");
-    wackerData.H2value = wackerData.H2value.replace("%3C%20", "");
-    wackerData.H2Ovalue = wackerData.H2Ovalue.replace("%3C%20", "");
-    wackerData.Fevalue = wackerData.Fevalue.replace("%3C%20", "");
-    wackerData.N2value = wackerData.N2value.replace("%2C", ".");
-    wackerData.O2Arvalue = wackerData.O2Arvalue.replace("%2C", ".");
-    wackerData.CO2value = wackerData.CO2value.replace("%2C", ".");
-    wackerData.COvalue = wackerData.COvalue.replace("%2C", ".");
-    wackerData.CH4value = wackerData.CH4value.replace("%2C", ".");
-    wackerData.H2value = wackerData.H2value.replace("%2C", ".");
-    wackerData.H2Ovalue = wackerData.H2Ovalue.replace("%2C", ".");
-    wackerData.Fevalue = wackerData.Fevalue.replace("%2C", ".");
+    var exp = parseInt(manDateTCSB.substring(7, 11)) + 2;
+    var expDateTCSB =
+      manDateTCSB.substring(0, 3) +
+      monthNameMan[monthMan] +
+      "-" +
+      exp.toString();
 
-    const wData = {
-      shipmentNumber: wackerData.shipmentNumber,
-      shipment: wackerData.shipmentdate,
-      lotNumber: data.Pages[0].Texts[42].R[0].T,
-      expiryDate: wackerData.expiryDate,
-      manDate: wackerData.manDate,
-      N2value: wackerData.N2value,
-      O2Arvalue: wackerData.O2Arvalue,
-      CO2value: wackerData.CO2value,
-      COvalue: wackerData.COvalue,
-      CH4value: wackerData.CH4value,
-      H2value: wackerData.H2value,
-      H2Ovalue: wackerData.H2Ovalue,
-      Fevalue: wackerData.Fevalue,
-    };
-    //console.log(wData);
+    // ricavo % di TCS (assayTCS)
+    var assayTCS = dataTCSB[5].join("");
+    assayTCS = assayTCS.replace(",", ".");
+    assayTCS = assayTCS.match(/\d./g);
+    assayTCS = assayTCS.join(".");
+    //console.log("assay TCS", assayTCS);
 
-    // passo i dati a xlm
-    Counter2();
-    async function Counter2() {
-      const woptions = {
+    // ricavo i drums numbers unendo e splittando le due stringhe
+    var str1 = dataTCSB[19].join("");
+    const str2 = dataTCSB[20].join("");
+    str1 = str1.concat(",", str2);
+    str1 = str1
+      .replace("Drum-No(s):", "")
+      .replace(".", ",")
+      .replace(".", ",")
+      .replace(",,", ",")
+      .replace(",,", ",");
+
+    let drumNumberTCSB = [];
+    drumNumberTCSB = str1.split(",");
+    for (let i = 0; i < drumNumberTCSB.length; i++) {
+      drumNumberTCSB[i] = drumNumberTCSB[i].trim();
+    }
+
+    // ricavo i parametri degli elementi in specifica
+    //Boron
+    var str3 = dataTCSB[9].join("");
+    str3 = str3.replace(",", ".").replace(",", ".");
+    let BvalueMake = [];
+    BvalueMake = str3.split("atomic");
+    var BvalueTCS = BvalueMake[1];
+    BvalueTCS = BvalueTCS.trim();
+    BvalueTCS = BvalueTCS.replace("ppb", "");
+    //Aluminum
+    var str4 = dataTCSB[10].join("");
+    str4 = str4.replace(",", ".").replace(",", ".");
+    let AlvalueMake = [];
+    AlvalueMake = str4.split("atomic");
+    var AlvalueTCS = AlvalueMake[1];
+    AlvalueTCS = AlvalueTCS.trim();
+    AlvalueTCS = AlvalueTCS.replace("ppb", "");
+    // Phosporous + Arsenic + Antimony
+    var str5 = dataTCSB[13].join("");
+    str5 = str5.replace(",", ".").replace(",", ".");
+    let PAsSbvalueMake = [];
+    PAsSbvalueMake = str5.split("atomic");
+    var PAsSbvalueTCS = PAsSbvalueMake[1];
+    PAsSbvalueTCS = PAsSbvalueTCS.trim();
+    PAsSbvalueTCS = PAsSbvalueTCS.replace("ppb", "");
+    // Carbon
+    var str6 = dataTCSB[14].join("");
+    str6 = str6.replace(",", ".").replace(",", ".");
+    let CvalueMake = [];
+    CvalueMake = str6.split("atomic");
+    var CvalueTCS = CvalueMake[1];
+    CvalueTCS = CvalueTCS.trim();
+    CvalueTCS = CvalueTCS.replace("ppm", "");
+    // Iron
+    var str7 = dataTCSB[16].join("");
+    str7 = str7.replace(",", ".").replace(",", ".");
+    let FevalueMake = [];
+    FevalueMake = str7.split("by weight");
+    var FevalueTCS = FevalueMake[1];
+    FevalueTCS = FevalueTCS.trim();
+    FevalueTCS = FevalueTCS.replace("ppb", "").replace("<", "");
+
+    //--------------TCS BURGHAUSEN COUNTER ------------
+    for (let i = 0; i < drumNumberTCSB.length; i++) {
+      const testResponse = await fetch("/apicounter");
+      var dataTest = await testResponse.text();
+      //console.log("dataTest1", dataTest);
+      dataTest = parseInt(dataTest);
+      dataTest++;
+      var dt = new Date();
+      var anno = dt.getFullYear().toString();
+      anno = anno.substring(2, 4);
+      if (dataTest < 10) {
+        shipmentNumberTCSB = "IT/000" + dataTest.toString() + "/" + anno;
+      }
+      if (dataTest >= 10 && dataTest < 100) {
+        shipmentNumberTCSB = "IT/00" + dataTest.toString() + "/" + anno;
+      }
+      if (dataTest >= 100 && dataTest < 1000) {
+        shipmentNumberTCSB = "IT/0" + dataTest.toString() + "/" + anno;
+      }
+      if (dataTest >= 1000) {
+        shipmentNumberTCSB = "IT/" + dataTest.toString() + "/" + anno;
+      }
+      if (dataTest > 10000) {
+        alert("reset counter.txt file");
+      }
+      shNumberTCS.push(shipmentNumberTCSB);
+      datacounter = { dataTest };
+      const optionCounter = {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(wData),
+        body: JSON.stringify(datacounter),
       };
-      const myresponsew = await fetch("/apitwo", woptions);
-      var myjsonw = await myresponsew.json();
-      console.log(myjsonw);
+      const myresponse = await fetch("/newcounter", optionCounter);
+      var myjson = await myresponse.text();
+      //console.log("myJson", myjson);
     }
-    document.getElementById("btndown").style.display = "inline";
-    document.getElementById("btnHome").style.display = "inline";
-    return;
+    //--------------END TCS BURGHAUSEN  COUNTER ------------
+
+    //dati TCS Burghausen da postare
+
+    const dataTCS = {
+      lotNumberTCSB: lotNumberTCSB,
+      shipmentDateTCSB: manDateTCSB,
+      plant: receivingPlant,
+      filenamesTCSB: drumNumberTCSB,
+      expiryDateTCSB: expDateTCSB,
+      manDateTCSB: manDateTCSB,
+      progressivoTCSB: shNumberTCS,
+      TCSBvalue: BvalueTCS,
+      TCSAlvalue: AlvalueTCS,
+      TCSPAsSbvalue: PAsSbvalueTCS,
+      TCSCvalue: CvalueTCS,
+      TCSFevalue: FevalueTCS,
+      TCSAssay: assayTCS,
+    };
+    console.log("dataTCS", dataTCS);
+
+    const TCSoptions = {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(dataTCS),
+    };
+    const myresponseTCS = await fetch("/TCS", TCSoptions);
+    //var myjsonTCS = await myresponseTCS.json();
+    //console.log(myjsonTCS);
   }
 }
 //--------------END TCS Burghausen-----------------------
@@ -965,43 +990,45 @@ function ChlorgasPdftoTxt(coaCS) {
     dataText = dataText.replace(/[\r\n]+/g, "\n\n");
     //Counter per shipment Number progressivo
     for (let index = 0; index < coaCS; index++) {
-      CounterCS();
-      async function CounterCS() {
-        let contatore;
-        const options = {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(contatore),
-        };
-        const myresponse = await fetch("/api", options);
-        var myjson = await myresponse.json();
-        myjson = parseInt(myjson);
-        var dt = new Date();
-        var anno = dt.getFullYear().toString();
-        anno = anno.substring(2, 4);
-        if (myjson < 10) {
-          shipmentNumberCS = "IT/000" + myjson.toString() + "/" + anno;
-        }
-        if (myjson >= 10 && myjson < 100) {
-          shipmentNumberCS = "IT/00" + myjson.toString() + "/" + anno;
-        }
-        if (myjson >= 100 && myjson < 1000) {
-          shipmentNumberCS = "IT/0" + myjson.toString() + "/" + anno;
-        }
-        if (myjson >= 1000) {
-          shipmentNumberCS = "IT/" + myjson.toString() + "/" + anno;
-        }
-        if (myjson > 10000) {
-          alert("reset counter.txt file");
-        }
-        shNumberCS.push(shipmentNumberCS);
-
-        window.localStorage.setItem("CSshipment", shNumberCS);
+      const testResponse = await fetch("/apicounter");
+      var dataTest = await testResponse.text();
+      //console.log("dataTest1", dataTest);
+      dataTest = parseInt(dataTest);
+      dataTest++;
+      var dt = new Date();
+      var anno = dt.getFullYear().toString();
+      anno = anno.substring(2, 4);
+      if (dataTest < 10) {
+        shipmentNumberCS = "IT/000" + dataTest.toString() + "/" + anno;
       }
+      if (dataTest >= 10 && dataTest < 100) {
+        shipmentNumberCS = "IT/00" + dataTest.toString() + "/" + anno;
+      }
+      if (dataTest >= 100 && dataTest < 1000) {
+        shipmentNumberCS = "IT/0" + dataTest.toString() + "/" + anno;
+      }
+      if (dataTest >= 1000) {
+        shipmentNumberCS = "IT/" + dataTest.toString() + "/" + anno;
+      }
+      if (dataTest > 10000) {
+        alert("reset counter.txt file");
+      }
+      shNumberCS.push(shipmentNumberCS);
+
+      datacounter = { dataTest };
+      const optionCounter = {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(datacounter),
+      };
+      const myresponse = await fetch("/newcounter", optionCounter);
+      var myjson = await myresponse.text();
+      //console.log("myjson", myjson);
     }
-    //console.log("shnumb array", shNumberCS);
+    //console.log("progressivo", shNumberCS);
+
     //creo matrice di dataText - tutti gli elementi
     for (let index = 0; index < dataText.length; index++) {
       var element = dataText[index];
@@ -1075,34 +1102,27 @@ function ChlorgasPdftoTxt(coaCS) {
       }
     }
 
-    arrayShN = window.localStorage.getItem("CSshipment");
-    arrayShN = arrayShN.split(",");
-    for (let index = 0; index < coaCS; index++) {
-      const dataCS = {
-        shipment: mfgDateCS[index],
-        lotNumber: shipmentLotNumberCS[index],
-        expiryDate: expDateCS[index],
-        manDate: mfgDateCS[index],
-        progressivoCS: arrayShN[index],
-        filetext: shipmentLotNumberCS,
-      };
-      //console.log("dataCS", index, "/", dataCS);
+    const dataCS = {
+      shipment: mfgDateCS,
+      lotNumber: shipmentLotNumberCS,
+      expiryDate: expDateCS,
+      manDate: mfgDateCS,
+      progressivoCS: shNumberCS,
+      filetext: shipmentLotNumberCS,
+    };
 
-      Counter2();
-      async function Counter2() {
-        const CSoptions = {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(dataCS),
-        };
-        const myresponseCS = await fetch("/apithree", CSoptions);
-        var myjsonCS = await myresponseCS.json();
-        console.log(myjsonCS);
-      }
-    }
+    //console.log("dataCS", dataCS);
+
+    const CSoptions = {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(dataCS),
+    };
+    const myresponseCS = await fetch("/apithree", CSoptions);
+    var myjsonCS = await myresponseCS.json();
+    console.log(myjsonCS);
   }
 }
-
 // ---------------- END CHLORGAS ----------------------
